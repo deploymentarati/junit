@@ -7,39 +7,50 @@ on:
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
+    - name: Checkout Repository
+      uses: actions/checkout@v2
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: maven
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
 
-      - name: Build with Maven
-        run: mvn clean install
+    - name: Build with Maven
+      run: |
+        cd junittestcases
+        mvn clean install
 
-      - name: Print Directory Contents
-        run: ls -R
-      # No need to list contents of ./target directory
+    - name: Print Directory Contents
+      run: |
+        ls -R
+        ls -R junittestcases/target
 
-      - name: Build Docker Image
-        run: docker build -f junittestcases/Dockerfile -t aratimahe/junittestcases:latest .
+    - name: Include target directory
+      run: |
+        mv junittestcases/target .
 
-      - name: Test Case Stage
-        run: |
-          # Add your test cases here
-          # Example: mvn test
+    - name: Build Docker Image
+      run: |
+        docker build -f junittestcases/Dockerfile -t aratimahe/junittestcases:latest .
 
-      - name: Docker Login to JFrog
-        run: echo ${{ secrets.JF_PASSWORD }} | docker login -u ${{ secrets.JF_USER }} --password-stdin githubactionsjfrog.jfrog.io
+        docker images
 
-      - name: Docker Tag
-        run: docker tag aratimahe/junittestcases githubactionsjfrog.jfrog.io/junittestcasesrepo/aratimahe/junittestcases:latest
+    - name: Test Case Stage
+      run: |
+        # Add your test cases here
+        # Example: mvn test
 
-      - name: Docker Push to JFrog
-        run: docker push githubactionsjfrog.jfrog.io/junittestcasesrepo/aratimahe/junittestcases:latest
+    - name: Docker Login to JFrog
+      run: echo ${{ secrets.JFJUNIT_PASSWORD }} | docker login -u ${{ secrets.JFJUNIT_USER }} --password-stdin githubactionsjfrog.jfrog.io
+
+    - name: Docker Tag
+      run: docker tag aratimahe/junittestcases githubactionsjfrog.jfrog.io/junittestcasesrepo/aratimahe/junittestcases:latest
+
+    - name: Docker Push to JFrog
+      run: docker push githubactionsjfrog.jfrog.io/junittestcasesrepo/aratimahe/junittestcases:latest
