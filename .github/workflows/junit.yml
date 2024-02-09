@@ -21,12 +21,17 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
+    - name: Print Directory Contents Before Build
+      run: |
+        ls -R
+        ls -R junittestcases
+
     - name: Build with Maven
       run: |
         cd junittestcases
         mvn clean install
 
-    - name: Print Directory Contents
+    - name: Print Directory Contents After Build
       run: |
         ls -R
         ls -R junittestcases/target
@@ -44,7 +49,8 @@ jobs:
     - name: Test Case Stage
       run: |
         # Add your test cases here
-         mvn test
+        cd junittestcases
+        mvn test
 
     - name: Docker Login to JFrog
       run: echo ${{ secrets.JF_PASSWORD }} | docker login -u ${{ secrets.JF_USER }} --password-stdin githubactionsjfrog.jfrog.io
