@@ -44,7 +44,7 @@ jobs:
     - name: Test Case Stage
       run: |
         # Add your test cases here
-        # Example: mvn test
+         mvn test
 
     - name: Docker Login to JFrog
       run: echo ${{ secrets.JF_PASSWORD }} | docker login -u ${{ secrets.JF_USER }} --password-stdin githubactionsjfrog.jfrog.io
